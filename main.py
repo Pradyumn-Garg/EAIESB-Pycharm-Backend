@@ -76,23 +76,59 @@ async def create_upload_file(projectName: str, file: UploadFile, conversiontype:
     if(conversiontype=="xlsxtocsv"):
         path2 = Path('C:/Users/Pradyumn Garg/Downloads/'+ ts + '_' + file.filename + ".csv")
         df = pd.read_excel(path)
-        # print(df)
         df.to_csv(path2)
         print(path2)
-        data = df.to_json(orient='split')
-        # print(data)
-        # return {"data": data}
+        return "success"
+
+    if (conversiontype == "xlsxtoxml"):
+        path2 = Path('C:/Users/Pradyumn Garg/Downloads/' + ts + '_' + file.filename + ".xml")
+        df = pd.read_excel(path)
+        df.to_xml(path2)
+        print(path2)
+        return "success"
+
+    if (conversiontype == "xlsxtojson"):
+        path2 = Path('C:/Users/Pradyumn Garg/Downloads/' + ts + '_' + file.filename + ".json")
+        df = pd.read_excel(path)
+        df.to_json(path2)
+        print(path2)
         return "success"
 
     if(conversiontype=="jsontoxml"):
         df = pd.read_json(path, orient='index')
         path2 = Path('C:/Users/Pradyumn Garg/Downloads/' + ts + '_' + file.filename + ".xml")
         df.to_xml(path2)
-        data = df.to_json(orient='split')
-        # return {"data": data}
+        return "success"
+
+    if (conversiontype == "jsontocsv"):
+        df = pd.read_json(path, orient='index')
+        path2 = Path('C:/Users/Pradyumn Garg/Downloads/' + ts + '_' + file.filename + ".csv")
+        df.to_csv(path2)
+        print(path2)
+        return "success"
+
+    if (conversiontype == "jsontoxlsx"):
+        df = pd.read_json(path, orient='index')
+        path2 = Path('C:/Users/Pradyumn Garg/Downloads/' + ts + '_' + file.filename + ".xlsx")
+        df.to_excel(path2)
         return "success"
 
     if(conversiontype=="xmltoxlsx"):
+        xml_data = open(path, 'r').read()
+        root = ET.XML(xml_data)  # Parse XML
+        data = []
+        cols = []
+        for i, child in enumerate(root):
+            data.append([subchild.text for subchild in child])
+            cols.append(child.tag)
+
+        df = pd.DataFrame(data).T  # Write in DF and transpose it
+        df.columns = cols  # Update column names
+        path2 = Path('C:/Users/Pradyumn Garg/Downloads/' + ts + '_' + file.filename + ".xlsx")
+        df.to_excel(path2)
+        return "success"
+
+    if (conversiontype == "xmltojson"):
         xml_data = open(path, 'r').read()
         root = ET.XML(xml_data)  # Parse XML
 
@@ -104,23 +140,42 @@ async def create_upload_file(projectName: str, file: UploadFile, conversiontype:
 
         df = pd.DataFrame(data).T  # Write in DF and transpose it
         df.columns = cols  # Update column names
-        path2 = Path('C:/Users/Pradyumn Garg/Downloads/' + ts + '_' + file.filename + ".xlsx")
+        path2 = Path('C:/Users/Pradyumn Garg/Downloads/' + ts + '_' + file.filename + ".json")
+        df.to_json(path2, orient="split")
+        return "success"
 
-        # print(df)
-        df.to_excel(path2)
-        data = df.to_json(orient='split')
-        # print(data)
-        # return {"data": data}
+    if (conversiontype == "xmltocsv"):
+        xml_data = open(path, 'r').read()
+        root = ET.XML(xml_data)  # Parse XML
+
+        data = []
+        cols = []
+        for i, child in enumerate(root):
+            data.append([subchild.text for subchild in child])
+            cols.append(child.tag)
+
+        df = pd.DataFrame(data).T  # Write in DF and transpose it
+        df.columns = cols  # Update column names
+        path2 = Path('C:/Users/Pradyumn Garg/Downloads/' + ts + '_' + file.filename + ".csv")
+        df.to_csv(path2)
         return "success"
 
     if(conversiontype=="csvtojson"):
         path2 = Path('C:/Users/Pradyumn Garg/Downloads/' + ts + '_' + file.filename + ".json")
-        # csvpath = Path('D:/output/'  + ts + '_' + file.filename + ".json")
-        csvfile = file.filename
         df = pd.read_csv(path)
         df.to_json(path2)
-        data = df.to_json(orient='split')
-        # return {"filename": file.filename, "csvdata": data}
+        return "success"
+
+    if (conversiontype == "csvtoxlsx"):
+        path2 = Path('C:/Users/Pradyumn Garg/Downloads/' + ts + '_' + file.filename + ".xlsx")
+        df = pd.read_csv(path)
+        df.to_excel(path2)
+        return "success"
+
+    if (conversiontype == "csvtoxml"):
+        path2 = Path('C:/Users/Pradyumn Garg/Downloads/' + ts + '_' + file.filename + ".xml")
+        df = pd.read_csv(path)
+        df.to_xml(path2)
         return "success"
 
 @app.post("/uploadfile/")
